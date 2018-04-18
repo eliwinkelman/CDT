@@ -1,11 +1,13 @@
 #include <iostream>
 #include <vector>
 
-struct vertice {
+struct Vertice {
     //a structure to hold each vertice on the manifold and pointers to the vertices it is connected to.
-    std::vector<vertice*> pastVertices;
-    std::vector<vertice*> futureVertices;
-    std::vector<vertice*> currentVertices;
+
+    //we hold these seperatedly to avoid needing to differentiate between pointers to vertices in the future in past geometrically.
+    std::vector<Vertice*> pastVertices;
+    std::vector<Vertice*> futureVertices;
+    std::vector<Vertice*> currentVertices;
 
     unsigned long numPast() {
         return pastVertices.size();
@@ -15,27 +17,50 @@ struct vertice {
     }
 };
 
-struct Manifold {
-    std::vector<vertice> manifold;
-
-    Manifold(int xNum, int tNum){
-        //populate the manifold with a base torus
-        for (int t=0; t<tNum; t++){
-            //each timelike layer
-
-
-
-        }
-    }
+class Manifold {
+    public:
+        std::vector<Vertice> manifold;
+        Manifold(int xNum, int tNum);
 };
 
+Manifold::Manifold(int xNum, int tNum) {
+    //populate the manifold with a base torus
+    for (int t=0; t<tNum; t++){
+        //each timelike layer
+
+        for (int x=0; x<xNum; x++){
+            manifold.push_back(*new Vertice());
+            if (x>0) {
+                //link to adjacent vertices in same time layer
+                manifold[t*xNum+x].currentVertices.push_back(&manifold[t*xNum+x-1]);
+                manifold[t*xNum+x-1].currentVertices.push_back(&manifold[t*xNum+x]);
+            }
+            if(t>0 and x>0) {
+                //link to past vertices
+                manifold[(t-1)*xNum+x-1].futureVertices.push_back(&manifold[t*xNum+x]);
+                manifold[(t-1)*xNum+x].futureVertices.push_back(&manifold[t*xNum+x]);
+                manifold[t*xNum+x].pastVertices.push_back(&manifold[(t-1)*xNum+x-1]);
+                manifold[t*xNum+x].pastVertices.push_back(&manifold[(t-1)*xNum+x]);
+            }
+        }
+
+    }
+}
 
 class CDTUniverse{
 
-    void rearrangement();
-    void sampleUniverse();
+    public:
+        Manifold manifold;
 
+        void rearrangement();
+        void sampleUniverse();
+
+        CDTUniverse(int, int);
 };
+
+CDTUniverse::CDTUniverse(int xNum, int tNum) : manifold(xNum, tNum){
+
+}
 
 void CDTUniverse::rearrangement(){
 
@@ -46,6 +71,7 @@ void CDTUniverse::sampleUniverse() {
 }
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
-    return 0;
+    CDTUniverse sampleUniverse(10,10);
+
+    
 }
