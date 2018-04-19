@@ -53,7 +53,7 @@ class CDTUniverse{
         Manifold manifold;
 
         void rearrangement();
-        void sampleUniverse();
+        void sampleUniverse(int);
 
         CDTUniverse(int, int);
 };
@@ -66,12 +66,14 @@ void CDTUniverse::rearrangement(){
 
 }
 
-void CDTUniverse::sampleUniverse() {
-
+void CDTUniverse::sampleUniverse(int rearrangements) {
+    for (int i = 0; i < rearrangements; i++){
+        rearrangement();
+    }
 }
 
 int main() {
-    CDTUniverse sampleUniverse(10,10);
+    CDTUniverse universe(10,10);
 
-    
+
 }
