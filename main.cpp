@@ -26,7 +26,7 @@ class Manifold {
             return manifold.size();
         }
 };
-b
+
 Manifold::Manifold(int xNum, int tNum){
     //populate the manifold with a base torus
     for (int t=0; t<tNum; t++){
@@ -76,6 +76,20 @@ void CDTUniverse::rearrangement(){
     //check if/which move accepted by metropolis algorithm
     if (probAddVertice > probRemoveVertice && probAddVertice > (double) rand()/RAND_MAX){
         //add vertice
+        Vertice newVertice;
+        int side = rand() % 2;
+        if (side) {
+            newVertice.currentVertices.push_back(&manifold.manifold[randomVertice]);
+            newVertice.currentVertices.push_back(manifold.manifold[randomVertice].currentVertices[0]);
+            newVertice.pastVertices.push_back(manifold.manifold[randomVertice].pastVertices[0]);
+            newVertice.futureVertices.push_back(manifold.manifold[randomVertice].futureVertices[0]);
+        }
+        else {
+            newVertice.currentVertices.push_back(manifold.manifold[randomVertice].currentVertices[-1]);
+            newVertice.currentVertices.push_back(&manifold.manifold[randomVertice]);
+            newVertice.pastVertices.push_back(manifold.manifold[randomVertice].pastVertices[-1]);
+            newVertice.futureVertices.push_back(manifold.manifold[randomVertice].futureVertices[-1]);
+        }
 
     }
     else if (probRemoveVertice > probAddVertice && probRemoveVertice > (double) rand()/RAND_MAX){
@@ -112,5 +126,8 @@ double CDTUniverse::probRemoveVertice(int randVert){
 int main() {
 
     CDTUniverse universe(10,10);
+
+    universe.sampleUniverse(10);
+
 
 }
