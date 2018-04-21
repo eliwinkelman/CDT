@@ -70,8 +70,17 @@ CDTUniverse::CDTUniverse(int xNum, int tNum) : manifold(xNum, tNum){
 
 void CDTUniverse::rearrangement(){
     int randomVertice = rand() % manifold.numVertices();
-    double probAddVertice;
-    double probRemoveVertice;
+    double probAddVertice = probMove(randomVertice);
+    double probRemoveVertice = probInverseMove(randomVertice);
+
+    //check if/which move accepted by metropolis algorithm
+    if (probAddVertice > probRemoveVertice && probAddVertice > (double) rand()/RAND_MAX){
+        //add vertice
+
+    }
+    else if (probRemoveVertice > probAddVertice && probRemoveVertice > (double) rand()/RAND_MAX){
+        //remove vertice
+    }
 }
 
 void CDTUniverse::sampleUniverse(int rearrangements){
