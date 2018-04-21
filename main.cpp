@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
-
+#include <stdlib.h>
+#include <math.h>
 struct Vertice {
     //a structure to hold each vertice on the manifold and pointers to the vertices it is connected to.
 
@@ -21,9 +22,12 @@ class Manifold {
     public:
         std::vector<Vertice> manifold;
         Manifold(int xNum, int tNum);
+        unsigned long numVertices(){
+            return manifold.size();
+        }
 };
-
-Manifold::Manifold(int xNum, int tNum) {
+b
+Manifold::Manifold(int xNum, int tNum){
     //populate the manifold with a base torus
     for (int t=0; t<tNum; t++){
         //each timelike layer
@@ -43,7 +47,6 @@ Manifold::Manifold(int xNum, int tNum) {
                 manifold[t*xNum+x].pastVertices.push_back(&manifold[(t-1)*xNum+x]);
             }
         }
-
     }
 }
 
@@ -51,29 +54,54 @@ class CDTUniverse{
 
     public:
         Manifold manifold;
-
+        double scaledCosmologicalConstant = 1;
         void rearrangement();
         void sampleUniverse(int);
-
+        double probMove(int);
+        double probInverseMove(int);
+        double probAddVertice(int);
+        double probRemoveVertice(int);
         CDTUniverse(int, int);
 };
 
 CDTUniverse::CDTUniverse(int xNum, int tNum) : manifold(xNum, tNum){
-
+    srand(time(NULL));
 }
 
 void CDTUniverse::rearrangement(){
-
+    int randomVertice = rand() % manifold.numVertices();
+    double probAddVertice;
+    double probRemoveVertice;
 }
 
-void CDTUniverse::sampleUniverse(int rearrangements) {
+void CDTUniverse::sampleUniverse(int rearrangements){
     for (int i = 0; i < rearrangements; i++){
         rearrangement();
     }
 }
 
-int main() {
-    CDTUniverse universe(10,10);
+double CDTUniverse::probMove(int randVert){
+    //equation 37
+    return manifold.numVertices()/(manifold.numVertices()+1) * (manifold.manifold[randVert].numPast() * manifold.manifold[randVert].numFuture())/2 * exp(-scaledCosmologicalConstant);
+}
 
+double CDTUniverse::probInverseMove(int randVert){
+    //equation 38
+    return exp(scaledCosmologicalConstant)/(manifold.manifold[randVert].numPast()+manifold.manifold[randVert].numFuture());
+}
+
+double CDTUniverse::probAddVertice(int randVert){
+    //equation 34
+    return probMove(randVert) * 1/(manifold.numVertices()*manifold.manifold[randVert].numPast() * manifold.manifold[randVert].numFuture());
+}
+
+double CDTUniverse::probRemoveVertice(int randVert){
+    //equation 35
+    return probInverseMove(randVert);
+}
+
+int main() {
+
+    CDTUniverse universe(10,10);
 
 }
